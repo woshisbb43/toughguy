@@ -446,6 +446,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // 打开管理页面函数
+    function openAdminPage() {
+        // 如果已有配置，传递给管理页面
+        const config = {
+            people: app.originalPeople || [],
+            prizes: originalPrizesHolder ? originalPrizesHolder.prizes : []
+        };
+        const configParam = encodeURIComponent(JSON.stringify(config));
+        window.open(`admin.html?config=${configParam}`, '_blank');
+    }
+
+    // 将函数暴露到全局作用域
+    window.openAdminPage = openAdminPage;
+
     window.lotteryApp = app; // 将应用实例暴露到全局，便于调试
     window.originalPrizesHolder = originalPrizesHolder; // 暴露到全局以便admin link使用
 });

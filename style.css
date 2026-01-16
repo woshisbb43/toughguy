@@ -27,14 +27,15 @@ body {
 
 .logo-container {
     margin-bottom: 15px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
 }
 
 .logo {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    border: 3px solid #000; /* 黑色边框 */
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    width: 100%;
+    max-width: 520px;
+    height: auto;
 }
 
 h1 {
@@ -214,24 +215,66 @@ h1 {
 
 .controls {
     margin: 20px 0;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
 button {
-    background-color: #000; /* 黑色 */
-    color: white;
-    border: none;
-    padding: 15px 30px;
+    padding: 15px 20px;
     border-radius: 8px;
     cursor: pointer;
     font-size: 18px;
-    margin: 0 10px;
     transition: all 0.3s ease;
     font-family: inherit;
     font-weight: bold;
+    min-width: 120px;
+    text-align: center;
 }
 
-button:hover:not(:disabled) {
+#startBtn {
+    background-color: #000; /* 黑色 */
+    color: white;
+    border: none;
+    flex: 1;
+    max-width: 200px;
+}
+
+#startBtn:hover:not(:disabled) {
     background-color: #333; /* 深灰色 */
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+#resetBtn {
+    background-color: white; /* 白色 */
+    color: black; /* 黑色文字 */
+    border: 2px solid #000; /* 黑色边框 */
+    flex: 1;
+    max-width: 200px;
+}
+
+#resetBtn:hover:not(:disabled) {
+    background-color: #f0f0f0; /* 浅灰色 */
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+.admin-link button {
+    background-color: white; /* 白色 */
+    color: black; /* 黑色文字 */
+    border: 2px solid #000; /* 黑色边框 */
+    text-decoration: none;
+    flex: 1;
+    max-width: 200px;
+    display: inline-block;
+    text-align: center;
+    padding: 15px 20px;
+}
+
+.admin-link button:hover {
+    background-color: #f0f0f0; /* 浅灰色 */
     transform: translateY(-2px);
     box-shadow: 0 10px 20px rgba(0,0,0,0.2);
 }
@@ -243,22 +286,6 @@ button:disabled {
     transform: none;
     box-shadow: none;
     opacity: 0.6; /* 降低透明度表示禁用状态 */
-}
-
-#startBtn {
-    background-color: #000; /* 黑色 */
-}
-
-#startBtn:hover:not(:disabled) {
-    background-color: #333; /* 深灰色 */
-}
-
-#resetBtn {
-    background-color: #333; /* 深灰色 */
-}
-
-#resetBtn:hover:not(:disabled) {
-    background-color: #555; /* 更浅的灰色 */
 }
 
 .history {
@@ -333,8 +360,7 @@ button:disabled {
     }
 
     .logo {
-        width: 60px;
-        height: 60px;
+        max-width: 320px;
     }
 
     h1 {
