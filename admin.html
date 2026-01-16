@@ -233,7 +233,7 @@
         // 从KV存储获取现有配置
         async function loadExistingConfig() {
             try {
-                const response = await fetch('/api/config');
+                const response = await fetch('https://toughguy.znbeebee.workers.dev/api/config');
                 if (response.ok) {
                     const config = await response.json();
                     people = Array.isArray(config.people) ? config.people : [];
@@ -352,7 +352,7 @@
                     prizes: prizes
                 };
 
-                const response = await fetch('/api/config', {
+                const response = await fetch('https://toughguy.znbeebee.workers.dev/api/config', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

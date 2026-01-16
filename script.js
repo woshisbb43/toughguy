@@ -1,7 +1,7 @@
 // 从KV存储获取配置数据
 async function getStoredConfig() {
   try {
-    const response = await fetch('/api/config');
+    const response = await fetch('https://toughguy.znbeebee.workers.dev/api/config');
     if (response.ok) {
       return await response.json();
     } else {
