@@ -388,26 +388,43 @@ document.addEventListener('DOMContentLoaded', () => {
         this.updateHistoryDisplay();
     };
 
-    // 初始化配置
-    app.initializeConfig = function() {
-        // 尝试从本地存储加载配置，如果没有则使用默认配置
-        let config = DEFAULT_CONFIG;
+    // 初始化配置 - 从 KV 加载
+    app.initializeConfig = async function() {
         try {
-            const storedConfig = localStorage.getItem('lotteryConfig');
-            if (storedConfig) {
-                const parsedConfig = JSON.parse(storedConfig);
-                if (Array.isArray(parsedConfig.people) && Array.isArray(parsedConfig.prizes)) {
-                    config = parsedConfig;
+            // 先尝试从 KV 加载
+            const response = await fetch('/api/config');
+            if (response.ok) {
+                const config = await response.json();
+                if (Array.isArray(config.people) && Array.isArray(config.prizes)) {
+                    this.people = [...config.people];
+                    this.originalPeople = [...config.people];
+                    this.prizes = [...config.prizes];
+                    this.originalPrizesHolder.prizes = [...config.prizes];
+                    this.usedPeople = [];
+                    this.history = [];
+
+                    // 更新UI
+                    this.updateInfoPanel();
+                    this.updateHistoryDisplay();
+                    this.startBtn.disabled = false;
+                    this.resetBtn.disabled = false;
+                    this.resultText.textContent = '配置已从云端加载，点击开始抽奖';
+                    this.resultText.classList.remove('winner');
+
+                    console.log('配置已从 KV 加载:', { people: this.people, prizes: this.prizes });
+                    return;
                 }
             }
         } catch (e) {
-            console.warn('无法解析本地存储的配置，使用默认配置:', e);
+            console.warn('从 KV 加载配置失败，使用默认配置:', e);
         }
 
+        // 如果 KV 加载失败，使用默认配置
+        let config = DEFAULT_CONFIG;
         this.people = [...config.people];
-        this.originalPeople = [...config.people]; // 保存原始列表
+        this.originalPeople = [...config.people];
         this.prizes = [...config.prizes];
-        this.originalPrizesHolder.prizes = [...config.prizes]; // 保存原始奖品列表
+        this.originalPrizesHolder.prizes = [...config.prizes];
         this.usedPeople = [];
         this.history = [];
 
@@ -416,10 +433,10 @@ document.addEventListener('DOMContentLoaded', () => {
         this.updateHistoryDisplay();
         this.startBtn.disabled = false;
         this.resetBtn.disabled = false;
-        this.resultText.textContent = '配置已加载，点击开始抽奖';
+        this.resultText.textContent = '使用默认配置，点击开始抽奖';
         this.resultText.classList.remove('winner');
 
-        console.log('配置已加载:', { people: this.people, prizes: this.prizes });
+        console.log('使用默认配置:', { people: this.people, prizes: this.prizes });
     };
 
     // 初始化配置
@@ -451,27 +468,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
-
-    // 打开管理页面函数
-    function openAdminPage() {
-        // 如果已有配置，传递给管理页面
-        const config = {
-            people: app.originalPeople || [],
-            prizes: originalPrizesHolder ? originalPrizesHolder.prizes : []
-        };
-        const configParam = encodeURIComponent(JSON.stringify(config));
-        // 导航到管理页面
-        window.location.href = `admin.html?config=${configParam}`;
-    }
-
-    // 将函数暴露到全局作用域
-    window.openAdminPage = openAdminPage;
-
-    // 为管理按钮添加事件监听器
-    const adminBtn = document.getElementById('adminBtn');
-    if (adminBtn) {
-        adminBtn.addEventListener('click', openAdminPage);
-    }
 
     window.lotteryApp = app; // 将应用实例暴露到全局，便于调试
     window.originalPrizesHolder = originalPrizesHolder; // 暴露到全局以便admin link使用

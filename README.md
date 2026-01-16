@@ -51,3 +51,24 @@
 4. index.html 直接读取当前存储实例中的配置信息
 5. admin.html 能够对存储实例中的配置信息进行增删改查
 6. 删除 js 文件中的配置信息，只使用存储实例中的
+
+## 部署说明
+
+详细部署步骤请查看 [DEPLOYMENT.md](./DEPLOYMENT.md)
+
+### 快速开始
+
+1. **本地测试**：
+   ```bash
+   python3 -m http.server 8000
+   # 访问 http://localhost:8000
+   ```
+
+2. **部署到 Cloudflare Pages**：
+   - 连接 Git 仓库自动部署
+   - 或使用 CLI：`npx wrangler pages deploy .`
+   - 配置 KV 绑定（详见 DEPLOYMENT.md）
+
+3. **配置管理**：
+   - 访问 `/admin.html` 管理人员和奖品
+   - 数据保存在 Cloudflare KV 中
