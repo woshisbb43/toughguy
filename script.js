@@ -467,6 +467,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // 将函数暴露到全局作用域
     window.openAdminPage = openAdminPage;
 
+    // 为管理按钮添加事件监听器
+    const adminBtn = document.getElementById('adminBtn');
+    if (adminBtn) {
+        adminBtn.addEventListener('click', openAdminPage);
+    }
+
     window.lotteryApp = app; // 将应用实例暴露到全局，便于调试
     window.originalPrizesHolder = originalPrizesHolder; // 暴露到全局以便admin link使用
 });
