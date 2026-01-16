@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOUGHGUY 配置管理</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .admin-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .management-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        
+        .section-title {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            color: #000;
+            border-bottom: 2px solid #000;
+            padding-bottom: 5px;
+        }
+        
+        .input-group {
+            display: flex;
+            margin-bottom: 15px;
+            gap: 10px;
+        }
+        
+        .input-group input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .add-btn {
+            background-color: #000;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .add-btn:hover {
+            background-color: #333;
+        }
+        
+        .items-list {
+            list-style: none;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 10px;
+            background: white;
+        }
+        
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .item-row:last-child {
+            border-bottom: none;
+        }
+        
+        .delete-btn {
+            background-color: #000; /* 统一为黑色 */
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .delete-btn:hover {
+            background-color: #333; /* 深灰色 */
+        }
+        
+        .action-buttons {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .save-btn {
+            background-color: #000;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            margin: 10px 5px;
+            display: inline-block;
+        }
+
+        .save-btn:hover {
+            background-color: #333;
+        }
+
+        .back-btn {
+            background-color: #000; /* 统一为黑色 */
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            margin: 10px 5px;
+            display: inline-block;
+        }
+
+        .back-btn:hover {
+            background-color: #333;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background-color: #2ecc71;
+            color: white;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 1000;
+        }
+
+        .mobile-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .admin-container {
+                margin: 10px;
+                padding: 15px;
+            }
+
+            .input-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .input-group input, .input-group button {
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .mobile-buttons {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .save-btn, .back-btn {
+                display: block;
+                margin: 10px auto !important;
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1>TOUGHGUY 配置管理</h1>
+            <p>管理内存中的人员和奖品数据（关闭管理页面后数据仍保留在内存中）</p>
+        </div>
+        
+        <div class="management-section">
+            <h2 class="section-title">人员管理</h2>
+            <div class="input-group">
+                <input type="text" id="personInput" placeholder="输入新人员姓名">
+                <button class="add-btn" onclick="addPerson()">添加人员</button>
+            </div>
+            <ul id="peopleList" class="items-list">
+                <!-- People will be added here dynamically -->
+            </ul>
+        </div>
+        
+        <div class="management-section">
+            <h2 class="section-title">奖品管理</h2>
+            <div class="input-group">
+                <input type="text" id="prizeInput" placeholder="输入新奖品名称">
+                <button class="add-btn" onclick="addPrize()">添加奖品</button>
+            </div>
+            <ul id="prizesList" class="items-list">
+                <!-- Prizes will be added here dynamically -->
+            </ul>
+        </div>
+        
+        <div class="action-buttons">
+            <div class="mobile-buttons">
+                <button class="save-btn" onclick="saveConfig()">保存配置</button>
+                <a href="index.html" class="back-btn">返回抽奖</a>
+            </div>
+        </div>
+    </div>
+    
+    <div id="notification" class="notification">配置已保存！</div>
+    
+    <script>
+        // 初始化数据
+        let people = [];
+        let prizes = [];
+        
+        // 从URL参数获取现有配置（如果有），否则使用默认配置
+        function loadExistingConfig() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const configParam = urlParams.get('config');
+
+            if (configParam) {
+                // 优先使用URL参数中的配置
+                try {
+                    const config = JSON.parse(decodeURIComponent(configParam));
+                    people = Array.isArray(config.people) ? config.people : [];
+                    prizes = Array.isArray(config.prizes) ? config.prizes : [];
+                } catch (e) {
+                    console.error('解析URL配置失败:', e);
+                    // 使用默认配置
+                    people = [];
+                    prizes = [];
+                }
+            } else {
+                // 尝试从父窗口获取配置
+                if (window.opener && window.opener.lotteryApp) {
+                    people = [...window.opener.lotteryApp.originalPeople];
+                    prizes = [...window.opener.lotteryApp.prizes];
+                } else {
+                    // 使用默认配置
+                    people = [];
+                    prizes = [];
+                }
+            }
+            renderLists();
+        }
+        
+        // 渲染列表
+        function renderLists() {
+            const peopleList = document.getElementById('peopleList');
+            const prizesList = document.getElementById('prizesList');
+            
+            // 清空现有列表
+            peopleList.innerHTML = '';
+            prizesList.innerHTML = '';
+            
+            // 渲染人员列表
+            people.forEach((person, index) => {
+                const li = document.createElement('li');
+                li.className = 'item-row';
+                li.innerHTML = `
+                    <span>${person}</span>
+                    <button class="delete-btn" onclick="removePerson(${index})">删除</button>
+                `;
+                peopleList.appendChild(li);
+            });
+            
+            // 渲染奖品列表
+            prizes.forEach((prize, index) => {
+                const li = document.createElement('li');
+                li.className = 'item-row';
+                li.innerHTML = `
+                    <span>${prize}</span>
+                    <button class="delete-btn" onclick="removePrize(${index})">删除</button>
+                `;
+                prizesList.appendChild(li);
+            });
+        }
+        
+        // 添加人员
+        function addPerson() {
+            const input = document.getElementById('personInput');
+            const name = input.value.trim();
+            
+            if (name) {
+                if (!people.includes(name)) {
+                    people.push(name);
+                    input.value = '';
+                    renderLists();
+                } else {
+                    alert('该人员已存在！');
+                }
+            }
+        }
+        
+        // 删除人员
+        function removePerson(index) {
+            people.splice(index, 1);
+            renderLists();
+        }
+        
+        // 添加奖品
+        function addPrize() {
+            const input = document.getElementById('prizeInput');
+            const name = input.value.trim();
+            
+            if (name) {
+                if (!prizes.includes(name)) {
+                    prizes.push(name);
+                    input.value = '';
+                    renderLists();
+                } else {
+                    alert('该奖品已存在！');
+                }
+            }
+        }
+        
+        // 删除奖品
+        function removePrize(index) {
+            prizes.splice(index, 1);
+            renderLists();
+        }
+        
+        // 保存配置到内存
+        function saveConfig() {
+            // 更新本地存储中的配置
+            const config = {
+                people: people,
+                prizes: prizes
+            };
+            localStorage.setItem('lotteryConfig', JSON.stringify(config));
+
+            // 尝试更新主窗口中的配置
+            if (window.opener && window.opener.lotteryApp) {
+                // 更新主应用的数据
+                window.opener.lotteryApp.originalPeople = [...people];
+                window.opener.lotteryApp.people = [...people];
+                window.opener.lotteryApp.prizes = [...prizes];
+
+                // 更新原始奖品持有者（通过应用实例持有的引用）
+                if (window.opener.lotteryApp.originalPrizesHolder) {
+                    window.opener.lotteryApp.originalPrizesHolder.prizes = [...prizes];
+                }
+
+                // 也更新全局的 originalPrizesHolder（为了兼容性）
+                if (window.opener.originalPrizesHolder) {
+                    window.opener.originalPrizesHolder.prizes = [...prizes];
+                }
+
+                // 更新主应用的UI
+                window.opener.lotteryApp.updateInfoPanel();
+
+                showNotification('配置已更新到内存中！');
+            } else {
+                // 即使没有 opener，也保存到本地存储
+                showNotification('配置已保存！点击"返回抽奖"按钮查看更新后的配置');
+            }
+        }
+        
+        // 显示通知
+        function showNotification(message = '配置已保存！') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.style.display = 'block';
+
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 5000); // 延长显示时间以显示较长的消息
+        }
+        
+        
+        // 页面加载时初始化
+        window.onload = function() {
+            loadExistingConfig();
+            
+            // 绑定回车键事件
+            document.getElementById('personInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addPerson();
+                }
+            });
+            
+            document.getElementById('prizeInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addPrize();
+                }
+            });
+        };
+    </script>
+</body>
+</html>
