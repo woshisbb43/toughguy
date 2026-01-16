@@ -1,7 +1,6 @@
 name = "toughguy"
 compatibility_date = "2023-12-01"
-
-pages_build_output_dir = "."
+main = "src/index.js"
 
 [[kv_namespaces]]
 binding = "LOTTERY_CONFIG"
