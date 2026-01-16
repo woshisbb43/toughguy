@@ -1,11 +1,19 @@
 // 从KV存储获取配置数据
 async function getStoredConfig() {
   try {
-    const response = await fetch('https://toughguy.znbeebee.workers.dev/api/config');
+    // 优先尝试 Pages Functions
+    let response = await fetch('/api/config');
+    if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
+      return await response.json();
+    }
+    
+    // 如果 Pages Functions 不可用，回退到 Worker
+    console.log('Pages Functions 不可用，尝试使用 Worker API');
+    response = await fetch('https://toughguy.znbeebee.workers.dev/api/config');
     if (response.ok) {
       return await response.json();
     } else {
-      console.warn('无法从KV获取配置，使用空配置');
+      console.warn('无法从 Worker 获取配置');
       return { people: [], prizes: [] };
     }
   } catch (error) {
@@ -419,24 +427,23 @@ document.addEventListener('DOMContentLoaded', () => {
             console.warn('从 KV 加载配置失败，使用默认配置:', e);
         }
 
-        // 如果 KV 加载失败，使用默认配置
-        let config = DEFAULT_CONFIG;
-        this.people = [...config.people];
-        this.originalPeople = [...config.people];
-        this.prizes = [...config.prizes];
-        this.originalPrizesHolder.prizes = [...config.prizes];
+        // 如果 KV 加载失败，使用空配置
+        this.people = [];
+        this.originalPeople = [];
+        this.prizes = [];
+        this.originalPrizesHolder.prizes = [];
         this.usedPeople = [];
         this.history = [];
 
         // 更新UI
         this.updateInfoPanel();
         this.updateHistoryDisplay();
-        this.startBtn.disabled = false;
-        this.resetBtn.disabled = false;
-        this.resultText.textContent = '使用默认配置，点击开始抽奖';
+        this.startBtn.disabled = true; // 无法开始抽奖，因为没有配置
+        this.resetBtn.disabled = true;
+        this.resultText.textContent = '无法从云端加载配置，请检查网络连接或前往管理页面配置';
         this.resultText.classList.remove('winner');
 
-        console.log('使用默认配置:', { people: this.people, prizes: this.prizes });
+        console.log('使用空配置，等待用户配置:', { people: this.people, prizes: this.prizes });
     };
 
     // 初始化配置

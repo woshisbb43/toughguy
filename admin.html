@@ -233,12 +233,25 @@
         // 从KV存储获取现有配置
         async function loadExistingConfig() {
             try {
-                const response = await fetch('/api/config');
+                // 优先尝试 Pages Functions
+                let response = await fetch('/api/config');
+                if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
+                    const config = await response.json();
+                    people = Array.isArray(config.people) ? config.people : [];
+                    prizes = Array.isArray(config.prizes) ? config.prizes : [];
+                    console.log('从 Pages Functions 加载配置成功:', config);
+                    renderLists();
+                    return;
+                }
+                
+                // 如果 Pages Functions 不可用，回退到 Worker
+                console.log('Pages Functions 不可用，尝试使用 Worker API');
+                response = await fetch('https://toughguy.znbeebee.workers.dev/api/config');
                 if (response.ok) {
                     const config = await response.json();
                     people = Array.isArray(config.people) ? config.people : [];
                     prizes = Array.isArray(config.prizes) ? config.prizes : [];
-                    console.log('从 KV 加载配置成功:', config);
+                    console.log('从 Worker 加载配置成功:', config);
                 } else {
                     // 如果没有配置，初始化为空数组
                     people = [];
@@ -338,7 +351,25 @@
                     prizes: prizes
                 };
 
-                const response = await fetch('/api/config', {
+                // 优先尝试 Pages Functions
+                let response = await fetch('/api/config', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(config)
+                });
+
+                if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
+                    const result = await response.json();
+                    console.log('保存配置成功 (Pages Functions):', result);
+                    showNotification('配置已保存到云端 KV！');
+                    return;
+                }
+
+                // 如果 Pages Functions 不可用，回退到 Worker
+                console.log('Pages Functions 不可用，尝试使用 Worker API');
+                response = await fetch('https://toughguy.znbeebee.workers.dev/api/config', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -348,7 +379,7 @@
 
                 if (response.ok) {
                     const result = await response.json();
-                    console.log('保存配置成功:', result);
+                    console.log('保存配置成功 (Worker):', result);
                     showNotification('配置已保存到云端 KV！');
                 } else {
                     const error = await response.json();
