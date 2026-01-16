@@ -1,0 +1,6 @@
+name = "toughguy"
+compatibility_date = "2023-12-01"
+
+[[kv_namespaces]]
+binding = "LOTTERY_CONFIG"
+id = "e96e7adbcd7c444aa4871a538553045a"

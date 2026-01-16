@@ -1,52 +1,26 @@
-// 默认配置数据
-const DEFAULT_CONFIG = {
-  people: [
-    "吴士伟",
-    "王猛",
-    "史努比",
-    "Donglei",
-    "蓝康宁",
-    "刘瀚霖",
-    "Forrest Gump",
-    "毛毛",
-    "于健",
-    "fcc",
-    "唐龙",
-    "Vincent",
-    "赞卜元",
-    "Kole",
-    "Andy乐宏ᴹᴰᴿᵀ",
-    "先报上",
-    "紫1",
-    "Nick hua",
-    "Bay",
-    "张楠",
-    "95%",
-    "邰利鹏 Frank.T",
-    "六七",
-    "大锅湖红鱼",
-    "Siqiang",
-    "朱一玮"
-  ],
-  prizes: [
-    "一等奖：iPhone 15",
-    "二等奖：iPad Air",
-    "三等奖：AirPods",
-    "四等奖：智能手表",
-    "五等奖：蓝牙耳机",
-    "纪念奖：保温杯",
-    "纪念奖：数据线",
-    "纪念奖：鼠标垫"
-  ]
-};
+// 从KV存储获取配置数据
+async function getStoredConfig() {
+  try {
+    const response = await fetch('/api/config');
+    if (response.ok) {
+      return await response.json();
+    } else {
+      console.warn('无法从KV获取配置，使用空配置');
+      return { people: [], prizes: [] };
+    }
+  } catch (error) {
+    console.error('获取配置失败:', error);
+    return { people: [], prizes: [] };
+  }
+}
 
 // 抽奖应用主逻辑
 class LotteryApp {
     constructor(originalPrizesHolder) {
         // 初始化状态
-        this.people = [...DEFAULT_CONFIG.people]; // 使用默认配置
-        this.prizes = [...DEFAULT_CONFIG.prizes]; // 使用默认配置
-        this.originalPeople = [...DEFAULT_CONFIG.people]; // 保存原始人员列表，用于重置
+        this.people = []; // 从KV获取
+        this.prizes = []; // 从KV获取
+        this.originalPeople = []; // 从KV获取并保存原始人员列表，用于重置
         this.originalPrizesHolder = originalPrizesHolder; // 保存原始奖品持有者引用
         this.usedPeople = []; // 已中奖的人员
         this.history = []; // 中奖历史
@@ -65,25 +39,41 @@ class LotteryApp {
         this.currentPeopleList = document.getElementById('currentPeopleList');
         this.remainingPrizesList = document.getElementById('remainingPrizesList');
 
-        // 查找管理链接并绑定事件
-        const adminLink = document.querySelector('.admin-link a');
-        if (adminLink) {
-            adminLink.addEventListener('click', (e) => {
-                // 如果已有配置，传递给管理页面
-                e.preventDefault();
-                const config = {
-                    people: this.originalPeople || [],
-                    prizes: this.originalPrizesHolder ? this.originalPrizesHolder.prizes : []
-                };
-                const configParam = encodeURIComponent(JSON.stringify(config));
-                window.location.href = `admin.html?config=${configParam}`;
-            });
-        }
-
         // 绑定事件
         this.bindEvents();
+
+        // 初始化配置
+        this.initializeConfig();
     }
     
+    async initializeConfig() {
+        try {
+            const config = await getStoredConfig();
+
+            this.people = [...config.people];
+            this.originalPeople = [...config.people]; // 保存原始列表
+            this.prizes = [...config.prizes];
+            this.originalPrizesHolder.prizes = [...config.prizes]; // 保存原始奖品列表
+            this.usedPeople = [];
+            this.history = [];
+
+            // 更新UI
+            this.updateInfoPanel();
+            this.updateHistoryDisplay();
+            this.startBtn.disabled = false;
+            this.resetBtn.disabled = false;
+            this.resultText.textContent = config.people.length > 0 && config.prizes.length > 0
+                ? '配置已加载，点击开始抽奖'
+                : '请先配置人员和奖品';
+            this.resultText.classList.remove('winner');
+
+            console.log('配置已加载:', { people: this.people, prizes: this.prizes });
+        } catch (error) {
+            console.error('初始化配置失败:', error);
+            this.resultText.textContent = '配置加载失败，请检查网络连接';
+        }
+    }
+
     bindEvents() {
         // 开始抽奖
         this.startBtn.addEventListener('click', () => {
