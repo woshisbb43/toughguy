@@ -460,8 +460,8 @@ document.addEventListener('DOMContentLoaded', () => {
             prizes: originalPrizesHolder ? originalPrizesHolder.prizes : []
         };
         const configParam = encodeURIComponent(JSON.stringify(config));
-        // 使用相对路径打开管理页面
-        window.open(`admin.html?config=${configParam}`, '_blank');
+        // 导航到管理页面
+        window.location.href = `admin.html?config=${configParam}`;
     }
 
     // 将函数暴露到全局作用域
